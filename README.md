@@ -35,3 +35,39 @@ GovEase AI closes the **Digital Bureaucracy Gap** with a 3-Agent architecture:
 ---
 
 ## 🏗️ System Architecture
+
+GovEase AI uses a **3-Agent architecture**:
+
+| Agent | Function |
+|-------|----------|
+| **Concierge** | Extracts data from IC/salary slip via GLM-5.1 |
+| **Guardian** | Adds watermarks (LHDN/PTPTN/EPF) to documents |
+| **Executor** | Chrome extension that auto-fills forms |
+
+### Data Flow
+`User → Concierge (GLM) → Guardian → Storage → Executor → Form Filled`
+
+### Tech Stack
+- Backend: Flask (Python)
+- AI: ILMU GLM-5.1
+- Extension: Chrome Manifest V3
+- Frontend: HTML/CSS/JS
+
+## 🔑 API Key Configuration
+
+This project requires an ILMU GLM-5.1 API key.
+
+### For Judges / Reviewers:
+
+1. **Get your API key** from: https://console.ilmu.ai/dashboard
+   - Sign up / Log in
+   - Go to **API Keys** → **Create API Key**
+   - Copy the key (starts with `sk-`)
+
+2. **The `config.py` file is already created and ignored by Git.**
+   - Open `config.py` in the project root
+   - Replace with your actual API key:
+
+```python
+# config.py
+ILMU_API_KEY = "sk-your-actual-api-key-here"
