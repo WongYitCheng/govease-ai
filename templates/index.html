@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GovEase AI</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: sans-serif; background: #f0f2f5;
+           display:flex; justify-content:center;
+           align-items:center; min-height:100vh; }
+    .container { width:440px; height:700px; background:white;
+                 border-radius:16px; display:flex;
+                 flex-direction:column; overflow:hidden;
+                 box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+    .header { background:#1D9E75; color:white; padding:18px 20px; }
+    .header h2 { font-size:17px; font-weight:600; }
+    .header p { font-size:12px; opacity:0.85; margin-top:3px; }
+    .portal-select { background:#155f48; padding:8px 16px;
+                     display:flex; align-items:center; gap:8px; }
+    .portal-select label { color:white; font-size:12px; }
+    .portal-select select { padding:4px 8px; border-radius:6px;
+                            border:none; font-size:12px; }
+    .messages { flex:1; overflow-y:auto; padding:16px;
+                display:flex; flex-direction:column; gap:10px; }
+    .msg { max-width:82%; padding:10px 14px; border-radius:12px;
+           font-size:13px; line-height:1.6; white-space:pre-wrap; }
+    .msg.bot { background:#f0f2f5; color:#222;
+               align-self:flex-start; border-radius:4px 12px 12px 12px; }
+    .msg.user { background:#1D9E75; color:white;
+                align-self:flex-end; border-radius:12px 4px 12px 12px; }
+    .msg.error { background:#fff0f0; color:#c0392b;
+                 align-self:flex-start; }
+    .input-area { padding:12px; border-top:1px solid #eee;
+                  display:flex; flex-direction:column; gap:8px; }
+    .upload-label { display:block; padding:8px 12px;
+                    background:#f8f9fa; border:1.5px dashed #ccc;
+                    border-radius:8px; text-align:center;
+                    font-size:12px; color:#666; cursor:pointer; }
+    .upload-label:hover { border-color:#1D9E75; color:#1D9E75;
+                          background:#f0faf6; }
+    #file-input { display:none; }
+    .file-name { font-size:11px; color:#1D9E75; 
+                 padding:2px 4px; }
+    .input-row { display:flex; gap:8px; }
+    .input-row input { flex:1; padding:10px 14px;
+                       border:1.5px solid #ddd; border-radius:20px;
+                       font-size:13px; outline:none; }
+    .input-row input:focus { border-color:#1D9E75; }
+    .send-btn { background:#1D9E75; color:white; border:none;
+                padding:10px 18px; border-radius:20px;
+                cursor:pointer; font-size:13px; font-weight:500; }
+    .send-btn:hover { background:#158a63; }
+    .extracted-card { background:#e8f8f2; border:1px solid #1D9E75;
+                      border-radius:10px; padding:10px 14px;
+                      font-size:12px; color:#0a5c3e;
+                      align-self:flex-start; max-width:90%; }
+    .extracted-card strong { display:block; margin-bottom:6px;
+                              font-size:13px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h2>GovEase AI</h2>
+    <p>Your intelligent government services assistant</p>
+  </div>
+
+  <div class="portal-select">
+    <label>Watermark for:</label>
+    <select id="portal-select">
+      <option value="LHDN">LHDN (Tax)</option>
+      <option value="PTPTN">PTPTN (Loan)</option>
+      <option value="EPF">EPF (Savings)</option>
+    </select>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="msg bot">Hello! I am GovEase AI.
+
+Send me a photo of your IC or salary slip — I will extract your details and protect your document with a watermark before it goes anywhere.
+
+I can help with LHDN, PTPTN, and EPF!</div>
+  </div>
+
+  <div class="input-area">
+    <label class="upload-label" for="file-input">
+      Attach IC photo or salary slip
+    </label>
+    <input type="file" id="file-input" accept="image/*">
+    <div class="file-name" id="file-name"></div>
+    <div class="input-row">
+      <input type="text" id="msg-input"
+             placeholder="Type a message...">
+      <button class="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById("file-input").addEventListener("change", function() {
+    const name = this.files[0]?.name || ""
+    document.getElementById("file-name").textContent = 
+      name ? "Attached: " + name : ""
+  })
+
+  document.getElementById("msg-input").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") sendMessage()
+  })
+
+  async function sendMessage() {
+    const input = document.getElementById("msg-input")
+    const fileInput = document.getElementById("file-input")
+    const portal = document.getElementById("portal-select").value
+    const message = input.value.trim()
+    const file = fileInput.files[0]
+
+    if (!message && !file) return
+
+    if (message) addMessage(message, "user")
+    if (file) addMessage("Sent: " + file.name, "user")
+
+    input.value = ""
+    document.getElementById("file-name").textContent = ""
+
+    const formData = new FormData()
+    formData.append("message", message)
+    formData.append("portal", portal)
+    if (file) formData.append("file", file)
+    fileInput.value = ""
+
+    const loading = addMessage("Analyzing your document...", "bot")
+
+    try {
+      const res = await fetch("/chat", {
+        method: "POST",
+        body: formData
+      })
+      const data = await res.json()
+      loading.remove()
+
+      if (data.status === "success") {
+        addMessage(data.reply, "bot")
+        if (data.extracted) {
+          showExtractedCard(data.extracted, portal)
+        }
+      } else {
+        addMessage(data.reply, "error")
+      }
+
+    } catch(e) {
+      loading.remove()
+      addMessage("Connection error. Is Flask running?", "error")
+    }
+  }
+
+  function addMessage(text, type) {
+    const msgs = document.getElementById("messages")
+    const div = document.createElement("div")
+    div.className = "msg " + type
+    div.textContent = text
+    msgs.appendChild(div)
+    msgs.scrollTop = msgs.scrollHeight
+    return div
+  }
+
+  function showExtractedCard(data, portal) {
+    const msgs = document.getElementById("messages")
+    const card = document.createElement("div")
+    card.className = "extracted-card"
+    card.innerHTML = `<strong>Extracted Data — Protected for ${portal}</strong>
+Name: ${data.full_name || "—"}
+IC No: ${data.ic_number || "—"}
+Address: ${data.address || "—"}
+DOB: ${data.date_of_birth || "—"}
+Confidence: ${data.confidence || "—"}`
+    msgs.appendChild(card)
+    msgs.scrollTop = msgs.scrollHeight
+  }
+  async function saveToExtension() {
+  try {
+    const res = await fetch('/get-data')
+    const data = await res.json()
+    
+    if (chrome && chrome.storage) {
+      chrome.storage.local.set({"govease_user_data": data})
+      alert("Data sent to extension! Now open any government portal.")
+    } else {
+      alert("Extension not detected. Make sure GovEase extension is enabled in Chrome.")
+    }
+  } catch(e) {
+    alert("Error: " + e.message)
+  }
+}
+</script>
+<div style="padding: 8px 12px; border-top: 1px solid #eee;">
+  <button onclick="saveToExtension()" style="
+    width:100%; padding:10px; background:#155f48; 
+    color:white; border:none; border-radius:8px; 
+    cursor:pointer; font-size:13px;">
+    Send Data to Browser Extension
+  </button>
+</div>
+</body>
+</html>
