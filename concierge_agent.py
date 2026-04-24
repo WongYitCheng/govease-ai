@@ -5,7 +5,7 @@ from pathlib import Path
 
 client = anthropic.Anthropic(
     base_url="https://api.ilmu.ai/anthropic",
-    api_key="sk-df64f20b1c46d8530dfb295823ca04db8e8e1d891f9c06a1"  # paste complete sk-... key
+    api_key=""  # paste complete sk-... key
 )
 
 
