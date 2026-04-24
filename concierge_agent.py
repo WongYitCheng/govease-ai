@@ -11,7 +11,10 @@ except ImportError:
 
 client = anthropic.Anthropic(
     base_url="https://api.ilmu.ai/anthropic",
+
     api_key=ILMU_API_KEY
+   
+
 )
 # 存储用户数据
 user_data = {
@@ -334,5 +337,19 @@ def clear_user_data():
         "parent_income": None, "course_code": None, "university": None,
         "epf_number": None, "tax_number": None
     }
+<<<<<<< HEAD
     collected_fields = set()
     current_portal = None
+=======
+    
+    month_name = months.get(mm, mm)
+    
+    return {
+        "day": dd,
+        "month": mm,
+        "month_name": month_name,
+        "year": full_year,
+        "formatted": f"{dd} {month_name} {full_year}",
+        "iso": f"{full_year}-{mm}-{dd}"
+    }
+>>>>>>> b68c86814f5778804842eecb6b2d35e054a2de81
