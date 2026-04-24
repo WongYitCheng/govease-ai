@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-Services Portal Malaysia - LHDN e-Filing</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #003399;
+            --primary-dark: #002266;
+            --accent: #1D9E75;
+            --accent-dark: #158a63;
+            --accent-light: #e8f8f2;
+            --bg: #f0f2f5;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --text: #1a202c;
+            --text-muted: #64748b;
+            --filled-bg: #e8f8f2;
+            --filled-border: #1D9E75;
+            --error: #e53e3e;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --radius: 10px;
+            --font: 'IBM Plex Sans', sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        /* ── Header ── */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-icon {
+            font-size: 36px;
+            line-height: 1;
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            opacity: 0.75;
+            margin-top: 2px;
+        }
+
+        .header-meta {
+            text-align: right;
+            font-size: 12px;
+            opacity: 0.75;
+        }
+
+        .header-meta strong {
+            display: block;
+            font-size: 13px;
+            opacity: 1;
+        }
+
+        /* ── Nav ── */
+        .nav {
+            background: var(--white);
+            padding: 0 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav a {
+            padding: 14px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav a:hover { color: var(--primary); }
+        .nav a.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        /* ── Container ── */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 24px 60px;
+        }
+
+        /* ── Form Container ── */
+        .form-container {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: white;
+            padding: 22px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .form-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .form-header p {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 3px;
+        }
+
+        .form-header-badge {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .form-body { padding: 28px 30px 30px; }
+
+        /* ── Section Headers ── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 28px 0 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-header:first-child { margin-top: 0; }
+
+        .section-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: -0.01em;
+        }
+
+        .section-icon {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        /* ── Form Rows & Groups ── */
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group.full-width { flex: 100%; min-width: 100%; }
+        .form-group.w-third { flex: 0 0 calc(33.333% - 11px); min-width: 140px; }
+        .form-group.w-two-third { flex: 0 0 calc(66.666% - 5px); min-width: 200px; }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-family: var(--font);
+            color: var(--text);
+            background: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(29,158,117,0.12);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.5;
+        }
+
+        .form-group select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+
+        /* ── Filled State ── */
+        .govease-filled {
+            background-color: var(--filled-bg) !important;
+            border-color: var(--filled-border) !important;
+        }
+
+        .govease-filled:focus {
+            box-shadow: 0 0 0 3px rgba(29,158,117,0.2) !important;
+        }
+
+        /* ── IC Number mono font ── */
+        #icNumber, #taxNumber {
+            font-family: var(--font-mono);
+            letter-spacing: 0.05em;
+        }
+
+        /* ── File Upload ── */
+        .file-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .upload-icon { font-size: 28px; margin-bottom: 8px; }
+
+        .upload-label {
+            font-size: 14px;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .upload-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .file-preview {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .file-preview-item {
+            background: var(--accent-light);
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--filled-border);
+            color: var(--text);
+        }
+
+        .watermark-badge {
+            background: var(--accent);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        /* ── Docs info ── */
+        .docs-info {
+            background: var(--accent-light);
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-top: 12px;
+            border: 1px solid rgba(29,158,117,0.25);
+            font-size: 13px;
+        }
+
+        /* ── Submit Button ── */
+        .btn-submit {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 40px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            width: 100%;
+            margin-top: 24px;
+            transition: opacity 0.2s, transform 0.15s;
+            letter-spacing: -0.01em;
+        }
+
+        .btn-submit:hover { opacity: 0.92; transform: translateY(-1px); }
+        .btn-submit:active { transform: translateY(0); }
+
+        /* ── FAB ── */
+        .govease-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 13px 22px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,51,153,0.35);
+            z-index: 1000;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .govease-fab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,51,153,0.4);
+        }
+
+        .fab-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.85); }
+        }
+
+        /* ── Success / Notification ── */
+        .success-message {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-top: 16px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .success-message.show { display: block; }
+
+        /* ── Fill Status Banner ── */
+        .fill-status {
+            position: fixed;
+            bottom: 80px;
+            right: 24px;
+            background: var(--primary);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 1001;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Field fill counter ── */
+        .fill-counter {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent-light);
+            border: 1px solid rgba(29,158,117,0.3);
+            color: var(--accent-dark);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .header { padding: 16px 20px; }
+            .nav { padding: 0 20px; gap: 0; }
+            .nav a { padding: 12px 14px; font-size: 12px; }
+            .container { padding: 20px 16px 60px; }
+            .form-body { padding: 20px 20px 24px; }
+            .form-group.w-third,
+            .form-group.w-two-third { flex: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">🏛️</div>
+            <div class="logo-text">
+                <h1>e-Services Portal Malaysia</h1>
+                <p>LHDN — Lembaga Hasil Dalam Negeri Malaysia</p>
+            </div>
+        </div>
+        <div class="header-meta">
+            <strong>Borang BE 2025</strong>
+            Tahun Taksiran 2025
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">e-Filing</a>
+        <a href="#">Semakan Bayaran Balik</a>
+        <a href="#">My Account</a>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <div>
+                    <h2>Borang BE 2025 — e-Filing</h2>
+                    <p>Sila isi maklumat dengan lengkap dan tepat / Please fill in all information accurately.</p>
+                </div>
+                <div class="form-header-badge">🤖 GovEase AI Ready</div>
+            </div>
+
+            <div class="form-body">
+                <form id="taxForm" autocomplete="off">
+
+                    <!-- ── Personal Information ── -->
+                    <div class="section-header">
+                        <span class="section-icon">📋</span>
+                        <h3>Personal Information</h3>
+                        <span id="personalCounter" class="fill-counter" style="display:none"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="fullName" placeholder="e.g. Ahmad bin Abdullah">
+                        </div>
+                        <div class="form-group">
+                            <label>IC Number (MyKad)</label>
+                            <input type="text" id="icNumber" placeholder="000000-00-0000" maxlength="14">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date of Birth</label>
+                            <input type="text" id="dob" placeholder="DD MM YYYY">
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="gender">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male / Lelaki</option>
+                                <option value="Female">Female / Perempuan</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Address / Alamat</label>
+                        <textarea id="address" rows="3" placeholder="No. XX, Jalan XX, Taman XX"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group w-third">
+                            <label>Postcode / Poskod</label>
+                            <input type="text" id="postcode" placeholder="50000" maxlength="5">
+                        </div>
+                        <div class="form-group w-third">
+                            <label>City / Bandar</label>
+                            <input type="text" id="city" placeholder="Kuala Lumpur">
+                        </div>
+                        <div class="form-group w-third">
+                            <label>State / Negeri</label>
+                            <select id="state">
+                                <option value="">Select State</option>
+                                <option value="Kuala Lumpur">W.P. Kuala Lumpur</option>
+                                <option value="Putrajaya">W.P. Putrajaya</option>
+                                <option value="Labuan">W.P. Labuan</option>
+                                <option value="Selangor">Selangor</option>
+                                <option value="Penang">Pulau Pinang</option>
+                                <option value="Johor">Johor</option>
+                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                <option value="Perak">Perak</option>
+                                <option value="Pahang">Pahang</option>
+                                <option value="Kedah">Kedah</option>
+                                <option value="Kelantan">Kelantan</option>
+                                <option value="Terengganu">Terengganu</option>
+                                <option value="Melaka">Melaka</option>
+                                <option value="Perlis">Perlis</option>
+                                <option value="Sabah">Sabah</option>
+                                <option value="Sarawak">Sarawak</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone Number / No. Telefon</label>
+                            <input type="text" id="phone" placeholder="012-3456789">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address / Emel</label>
+                            <input type="email" id="email" placeholder="you@example.com">
+                        </div>
+                    </div>
+
+                    <!-- ── Tax Information ── -->
+                    <div class="section-header">
+                        <span class="section-icon">💰</span>
+                        <h3>Tax Information</h3>
+                        <span id="taxCounter" class="fill-counter" style="display:none"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Monthly Income (RM)</label>
+                            <input type="text" id="monthlyIncome" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label>Employer / Majikan</label>
+                            <input type="text" id="employer" placeholder="Company name">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tax Reference Number / No. Rujukan Cukai</label>
+                            <input type="text" id="taxNumber" placeholder="SG 1234567890">
+                        </div>
+                        <div class="form-group">
+                            <label>Annual Income (RM)</label>
+                            <input type="text" id="annualIncome" placeholder="Auto-calculated">
+                        </div>
+                    </div>
+
+                    <!-- ── Supporting Documents ── -->
+                    <div class="section-header">
+                        <span class="section-icon">📎</span>
+                        <h3>Supporting Documents</h3>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>IC Copy (MyKad) / EA Form / Salary Slip</label>
+                        <div id="documentPreviewArea">
+                            <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                                <div class="upload-icon">📸</div>
+                                <div class="upload-label">Click to upload document</div>
+                                <div class="upload-hint">JPG, PNG or PDF — Max 5MB each</div>
+                                <input type="file" id="fileInput" style="display:none" accept="image/*,application/pdf" multiple>
+                            </div>
+                        </div>
+                        <div id="filePreviewList" class="file-preview"></div>
+                    </div>
+
+                    <div id="autoDocPreview" class="docs-info" style="display:none;">
+                        <strong>📄 Documents from GovEase AI:</strong>
+                        <div id="autoDocList" style="margin-top:8px;"></div>
+                    </div>
+
+                    <!-- ── Submit ── -->
+                    <button type="button" class="btn-submit" onclick="submitForm()">
+                        Hantar Borang / Submit Application
+                    </button>
+
+                    <div id="successMessage" class="success-message">
+                        ✅ <strong>Permohonan berjaya dihantar!</strong><br>
+                        No. Rujukan: <strong id="refNo"></strong>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <button class="govease-fab" id="goveaseFillBtn">
+        <span class="fab-dot"></span>
+        🤖 GovEase AI — Fill Form
+    </button>
+
+    <script>
+        // ─────────────────────────────────────────
+        // Helpers
+        // ─────────────────────────────────────────
+        function setValue(id, value) {
+            const el = document.getElementById(id);
+            if (el && value !== null && value !== undefined && value !== '' && value !== 'null') {
+                el.value = value;
+                el.classList.add('govease-filled');
+                return true;
+            }
+            return false;
+        }
+
+        function showNotification(msg, color) {
+            const existing = document.querySelector('.fill-status');
+            if (existing) existing.remove();
+            const notif = document.createElement('div');
+            notif.className = 'fill-status';
+            notif.style.background = color || 'var(--primary)';
+            notif.innerHTML = msg;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3500);
+        }
+
+        // ─────────────────────────────────────────
+        // Main fill function — uses pre-parsed data directly
+        // ─────────────────────────────────────────
+        function fillFormWithData(data) {
+            console.log('[Mock Portal] Filling form with:', data);
+            let filled = 0;
+
+            // ── Personal Info ──
+            if (setValue('fullName',  data.full_name))     filled++;
+            if (setValue('icNumber',  data.ic_number))     filled++;
+            if (setValue('dob',       data.date_of_birth)) filled++;
+            if (setValue('address',   data.address))       filled++;
+            if (setValue('email',     data.email))         filled++;
+            if (setValue('phone',     data.phone))         filled++;
+
+            // ── Address breakdown — use pre-parsed fields, NOT re-parsing the string ──
+            if (setValue('postcode', data.postcode)) filled++;
+            if (setValue('city',     data.city))     filled++;
+            if (setValue('state',    data.state))    filled++;   // works because all states are in <select>
+
+            // ── Tax Info ──
+            if (setValue('monthlyIncome', data.monthly_income)) filled++;
+            if (setValue('employer',      data.employer))       filled++;
+            if (setValue('taxNumber',     data.tax_number))     filled++;
+
+            // ── Auto-calculate annual income from monthly ──
+            if (data.monthly_income) {
+                const monthly = parseFloat(data.monthly_income.toString().replace(/[^0-9.]/g, ''));
+                if (!isNaN(monthly)) {
+                    setValue('annualIncome', (monthly * 12).toFixed(2));
+                }
+            }
+
+            // ── Uploaded Documents ──
+            if (data.uploaded_documents && data.uploaded_documents.length > 0) {
+                const autoDocDiv  = document.getElementById('autoDocPreview');
+                const autoDocList = document.getElementById('autoDocList');
+                autoDocList.innerHTML = '';
+                data.uploaded_documents.forEach(doc => {
+                    const item = document.createElement('div');
+                    item.className = 'file-preview-item';
+                    item.style.marginBottom = '6px';
+                    item.innerHTML = `📄 ${doc.name} <span class="watermark-badge">✓ FOR ${doc.portal} USE ONLY</span>`;
+                    autoDocList.appendChild(item);
+                });
+                autoDocDiv.style.display = 'block';
+            }
+
+            updateCounters();
+            showNotification(`✅ GovEase AI filled <strong>${filled}</strong> fields successfully!`);
+        }
+
+        // ─────────────────────────────────────────
+        // Fill counter badges
+        // ─────────────────────────────────────────
+        function updateCounters() {
+            const personalIds = ['fullName','icNumber','dob','gender','address','postcode','city','state','phone','email'];
+            const taxIds      = ['monthlyIncome','employer','taxNumber','annualIncome'];
+
+            function countFilled(ids) {
+                return ids.filter(id => {
+                    const el = document.getElementById(id);
+                    return el && el.value && el.classList.contains('govease-filled');
+                }).length;
+            }
+
+            const pCount = countFilled(personalIds);
+            const tCount = countFilled(taxIds);
+
+            const pEl = document.getElementById('personalCounter');
+            const tEl = document.getElementById('taxCounter');
+
+            if (pCount > 0) {
+                pEl.textContent = `${pCount} / ${personalIds.length} filled`;
+                pEl.style.display = 'inline-flex';
+            }
+            if (tCount > 0) {
+                tEl.textContent = `${tCount} / ${taxIds.length} filled`;
+                tEl.style.display = 'inline-flex';
+            }
+        }
+
+        // ─────────────────────────────────────────
+        // File upload handler
+        // ─────────────────────────────────────────
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const previewDiv = document.getElementById('filePreviewList');
+            for (let file of e.target.files) {
+                const item = document.createElement('div');
+                item.className = 'file-preview-item';
+                item.innerHTML = `📄 ${file.name} <span class="watermark-badge">Pending</span>`;
+                previewDiv.appendChild(item);
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('portal', 'LHDN');
+
+                fetch('/upload-and-watermark', { method: 'POST', body: formData })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            item.innerHTML = `📄 ${file.name} <span class="watermark-badge">✓ FOR LHDN USE ONLY</span>`;
+                        }
+                    })
+                    .catch(() => {});
+            }
+        });
+
+        // ─────────────────────────────────────────
+        // Submit
+        // ─────────────────────────────────────────
+        function submitForm() {
+            const ref = 'LHDN' + new Date().getFullYear() + '-' + Math.floor(Math.random() * 900000 + 100000);
+            document.getElementById('refNo').textContent = ref;
+            const msg = document.getElementById('successMessage');
+            msg.classList.add('show');
+            setTimeout(() => msg.classList.remove('show'), 5000);
+        }
+
+        // ─────────────────────────────────────────
+        // Fetch from Flask
+        // ─────────────────────────────────────────
+        function fetchAndFill() {
+            fetch('http://localhost:5000/get-data')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.full_name) {
+                        fillFormWithData(data);
+                    } else {
+                        showNotification('❌ Please complete the chat setup first!', '#e53e3e');
+                    }
+                })
+                .catch(() => {
+                    showNotification('❌ Cannot connect to server. Make sure Flask is running!', '#e53e3e');
+                });
+        }
+
+        // ─────────────────────────────────────────
+        // Event listeners
+        // ─────────────────────────────────────────
+        document.getElementById('goveaseFillBtn').addEventListener('click', fetchAndFill);
+
+        window.addEventListener('load', () => {
+            fetch('http://localhost:5000/get-data')
+                .then(res => res.json())
+                .then(data => { if (data.full_name) fillFormWithData(data); })
+                .catch(() => {});
+        });
+
+        console.log('[Mock Portal] Ready — awaiting GovEase data');
+    </script>
+</body>
+</html>

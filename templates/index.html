@@ -1,205 +1,561 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GovEase AI</title>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: sans-serif; background: #f0f2f5;
-           display:flex; justify-content:center;
-           align-items:center; min-height:100vh; }
-    .container { width:440px; height:700px; background:white;
-                 border-radius:16px; display:flex;
-                 flex-direction:column; overflow:hidden;
-                 box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
-    .header { background:#1D9E75; color:white; padding:18px 20px; }
-    .header h2 { font-size:17px; font-weight:600; }
-    .header p { font-size:12px; opacity:0.85; margin-top:3px; }
-    .portal-select { background:#155f48; padding:8px 16px;
-                     display:flex; align-items:center; gap:8px; }
-    .portal-select label { color:white; font-size:12px; }
-    .portal-select select { padding:4px 8px; border-radius:6px;
-                            border:none; font-size:12px; }
-    .messages { flex:1; overflow-y:auto; padding:16px;
-                display:flex; flex-direction:column; gap:10px; }
-    .msg { max-width:82%; padding:10px 14px; border-radius:12px;
-           font-size:13px; line-height:1.6; white-space:pre-wrap; }
-    .msg.bot { background:#f0f2f5; color:#222;
-               align-self:flex-start; border-radius:4px 12px 12px 12px; }
-    .msg.user { background:#1D9E75; color:white;
-                align-self:flex-end; border-radius:12px 4px 12px 12px; }
-    .msg.error { background:#fff0f0; color:#c0392b;
-                 align-self:flex-start; }
-    .input-area { padding:12px; border-top:1px solid #eee;
-                  display:flex; flex-direction:column; gap:8px; }
-    .upload-label { display:block; padding:8px 12px;
-                    background:#f8f9fa; border:1.5px dashed #ccc;
-                    border-radius:8px; text-align:center;
-                    font-size:12px; color:#666; cursor:pointer; }
-    .upload-label:hover { border-color:#1D9E75; color:#1D9E75;
-                          background:#f0faf6; }
-    #file-input { display:none; }
-    .file-name { font-size:11px; color:#1D9E75; 
-                 padding:2px 4px; }
-    .input-row { display:flex; gap:8px; }
-    .input-row input { flex:1; padding:10px 14px;
-                       border:1.5px solid #ddd; border-radius:20px;
-                       font-size:13px; outline:none; }
-    .input-row input:focus { border-color:#1D9E75; }
-    .send-btn { background:#1D9E75; color:white; border:none;
-                padding:10px 18px; border-radius:20px;
-                cursor:pointer; font-size:13px; font-weight:500; }
-    .send-btn:hover { background:#158a63; }
-    .extracted-card { background:#e8f8f2; border:1px solid #1D9E75;
-                      border-radius:10px; padding:10px 14px;
-                      font-size:12px; color:#0a5c3e;
-                      align-self:flex-start; max-width:90%; }
-    .extracted-card strong { display:block; margin-bottom:6px;
-                              font-size:13px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GovEase AI - Your Intelligent Government Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .chat-container {
+            width: 500px;
+            max-width: 100%;
+            height: 750px;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #1D9E75 0%, #0d5c45 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .chat-header h1 {
+            font-size: 22px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .chat-header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .portal-selector {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .portal-selector select {
+            padding: 8px 16px;
+            border-radius: 24px;
+            border: none;
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+        }
+        
+        .portal-selector select option {
+            color: #333;
+        }
+        
+        /* 消息区域 - 可滚动 */
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f5f7fa;
+        }
+        
+        .msg {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 13px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        
+        .msg.bot {
+            background: white;
+            color: #1a1a2e;
+            align-self: flex-start;
+            border-radius: 18px 18px 18px 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .msg.user {
+            background: #1D9E75;
+            color: white;
+            align-self: flex-end;
+            border-radius: 18px 18px 4px 18px;
+        }
+        
+        .msg.error {
+            background: #fee2e2;
+            color: #c0392b;
+            align-self: flex-start;
+            border-radius: 18px 18px 18px 4px;
+        }
+        
+        /* 输入区域 */
+        .input-area {
+            padding: 16px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        
+        .input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 28px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .input-area input:focus {
+            border-color: #1D9E75;
+        }
+        
+        .input-area button {
+            background: #1D9E75;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 28px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .input-area button:hover {
+            background: #158a63;
+        }
+        
+        /* 底部按钮区域 */
+        .action-buttons {
+            padding: 12px 16px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 10px 12px;
+            background: #f0f2f5;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .action-btn:hover {
+            background: #e4e6e9;
+        }
+        
+        .action-btn.primary {
+            background: #1D9E75;
+            color: white;
+        }
+        
+        .action-btn.primary:hover {
+            background: #158a63;
+        }
+        
+        .action-btn.danger {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .action-btn.danger:hover {
+            background: #e04350;
+        }
+        
+        .file-upload {
+            background: #1D9E75;
+            color: white;
+        }
+        
+        .file-upload:hover {
+            background: #158a63;
+        }
+        
+        /* 文档面板 - 独立区域，不遮挡消息 */
+        .docs-panel {
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            padding: 12px 16px;
+            max-height: 200px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        
+        .docs-panel h4 {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .doc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 11px;
+        }
+        
+        .doc-item:last-child {
+            border-bottom: none;
+        }
+        
+        .doc-name {
+            color: #333;
+            word-break: break-all;
+        }
+        
+        .doc-portal {
+            background: #1D9E75;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 9px;
+        }
+        
+        .doc-download {
+            background: none;
+            border: none;
+            color: #1D9E75;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        /* 水印预览 - 折叠式 */
+        .watermark-preview {
+            background: #1a1a2e;
+            color: white;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        
+        .watermark-preview span {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        
+        .watermark-preview .download-link {
+            background: #1D9E75;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1D9E75;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <h2>GovEase AI</h2>
-    <p>Your intelligent government services assistant</p>
-  </div>
-
-  <div class="portal-select">
-    <label>Watermark for:</label>
-    <select id="portal-select">
-      <option value="LHDN">LHDN (Tax)</option>
-      <option value="PTPTN">PTPTN (Loan)</option>
-      <option value="EPF">EPF (Savings)</option>
-    </select>
-  </div>
-
-  <div class="messages" id="messages">
-    <div class="msg bot">Hello! I am GovEase AI.
-
-Send me a photo of your IC or salary slip — I will extract your details and protect your document with a watermark before it goes anywhere.
-
-I can help with LHDN, PTPTN, and EPF!</div>
-  </div>
-
-  <div class="input-area">
-    <label class="upload-label" for="file-input">
-      Attach IC photo or salary slip
-    </label>
-    <input type="file" id="file-input" accept="image/*">
-    <div class="file-name" id="file-name"></div>
-    <div class="input-row">
-      <input type="text" id="msg-input"
-             placeholder="Type a message...">
-      <button class="send-btn" onclick="sendMessage()">Send</button>
+    <div class="chat-container">
+        <!-- 头部 -->
+        <div class="chat-header">
+            <h1>
+                <span>🏛️</span> GovEase AI
+            </h1>
+            <p>Your Intelligent Government Services Assistant</p>
+            <div class="portal-selector">
+                <select id="portalSelect">
+                    <option value="LHDN">📄 LHDN (Tax Filing)</option>
+                    <option value="PTPTN">🎓 PTPTN (Education Loan)</option>
+                    <option value="EPF">💰 EPF (Savings/Withdrawal)</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- 消息区域 - 主要聊天内容 -->
+        <div class="messages" id="messages">
+            <div class="msg bot">
+                🏛️ <strong>Welcome to GovEase AI!</strong><br><br>
+                I am your intelligent assistant for Malaysian government services.<br>
+                I can help you with:<br>
+                • 📄 LHDN (Tax filing)<br>
+                • 🎓 PTPTN (Education loan)<br>
+                • 💼 EPF (Savings/Withdrawal)<br><br>
+                <strong>Let me collect your basic information first.</strong><br><br>
+                ❓ <strong>What is your full name?</strong>
+            </div>
+        </div>
+        
+        <!-- 文档面板 - 独立显示已上传文件 -->
+        <div class="docs-panel" id="docsPanel" style="display: none;">
+            <h4>📋 Uploaded Documents</h4>
+            <div id="documentList"></div>
+        </div>
+        
+        <!-- 水印预览栏 - 折叠式 -->
+        <div class="watermark-preview" id="watermarkBar" style="display: none;" onclick="downloadWatermarked()">
+            <span>🔒 Watermarked document ready</span>
+            <button class="download-link" onclick="event.stopPropagation(); downloadWatermarked();">📥 Download</button>
+        </div>
+        
+        <!-- 输入区域 -->
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        
+        <!-- 按钮区域 -->
+        <div class="action-buttons">
+            <label class="action-btn file-upload">
+                📎 Upload Document
+                <input type="file" id="fileInput" style="display: none" accept="image/*,application/pdf">
+            </label>
+            <button class="action-btn primary" onclick="sendToExtension()">💾 Send to Extension</button>
+            <button class="action-btn danger" onclick="resetChat()">🔄 Reset</button>
+        </div>
     </div>
-  </div>
-</div>
-
-<script>
-  document.getElementById("file-input").addEventListener("change", function() {
-    const name = this.files[0]?.name || ""
-    document.getElementById("file-name").textContent = 
-      name ? "Attached: " + name : ""
-  })
-
-  document.getElementById("msg-input").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") sendMessage()
-  })
-
-  async function sendMessage() {
-    const input = document.getElementById("msg-input")
-    const fileInput = document.getElementById("file-input")
-    const portal = document.getElementById("portal-select").value
-    const message = input.value.trim()
-    const file = fileInput.files[0]
-
-    if (!message && !file) return
-
-    if (message) addMessage(message, "user")
-    if (file) addMessage("Sent: " + file.name, "user")
-
-    input.value = ""
-    document.getElementById("file-name").textContent = ""
-
-    const formData = new FormData()
-    formData.append("message", message)
-    formData.append("portal", portal)
-    if (file) formData.append("file", file)
-    fileInput.value = ""
-
-    const loading = addMessage("Analyzing your document...", "bot")
-
-    try {
-      const res = await fetch("/chat", {
-        method: "POST",
-        body: formData
-      })
-      const data = await res.json()
-      loading.remove()
-
-      if (data.status === "success") {
-        addMessage(data.reply, "bot")
-        if (data.extracted) {
-          showExtractedCard(data.extracted, portal)
-        }
-      } else {
-        addMessage(data.reply, "error")
-      }
-
-    } catch(e) {
-      loading.remove()
-      addMessage("Connection error. Is Flask running?", "error")
-    }
-  }
-
-  function addMessage(text, type) {
-    const msgs = document.getElementById("messages")
-    const div = document.createElement("div")
-    div.className = "msg " + type
-    div.textContent = text
-    msgs.appendChild(div)
-    msgs.scrollTop = msgs.scrollHeight
-    return div
-  }
-
-  function showExtractedCard(data, portal) {
-    const msgs = document.getElementById("messages")
-    const card = document.createElement("div")
-    card.className = "extracted-card"
-    card.innerHTML = `<strong>Extracted Data — Protected for ${portal}</strong>
-Name: ${data.full_name || "—"}
-IC No: ${data.ic_number || "—"}
-Address: ${data.address || "—"}
-DOB: ${data.date_of_birth || "—"}
-Confidence: ${data.confidence || "—"}`
-    msgs.appendChild(card)
-    msgs.scrollTop = msgs.scrollHeight
-  }
-  async function saveToExtension() {
-  try {
-    const res = await fetch('/get-data')
-    const data = await res.json()
     
-    if (chrome && chrome.storage) {
-      chrome.storage.local.set({"govease_user_data": data})
-      alert("Data sent to extension! Now open any government portal.")
-    } else {
-      alert("Extension not detected. Make sure GovEase extension is enabled in Chrome.")
-    }
-  } catch(e) {
-    alert("Error: " + e.message)
-  }
-}
-</script>
-<div style="padding: 8px 12px; border-top: 1px solid #eee;">
-  <button onclick="saveToExtension()" style="
-    width:100%; padding:10px; background:#155f48; 
-    color:white; border:none; border-radius:8px; 
-    cursor:pointer; font-size:13px;">
-    Send Data to Browser Extension
-  </button>
-</div>
+    <script>
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const fileInput = document.getElementById('fileInput');
+        const portalSelect = document.getElementById('portalSelect');
+        
+        let uploadedDocuments = [];
+        let currentWatermarkedFile = null;
+        
+        // 文件上传
+        fileInput.onchange = async () => {
+            const files = fileInput.files;
+            const portal = portalSelect.value;
+            
+            for (let file of files) {
+                addMessage(`📎 Uploading: ${file.name} (for ${portal})`, 'user');
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('portal', portal);
+                
+                try {
+                    const res = await fetch('/upload-and-watermark', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    
+                    if (data.status === 'success') {
+                        uploadedDocuments.push({
+                            name: file.name,
+                            portal: portal,
+                            path: data.watermarked,
+                            timestamp: new Date().toLocaleString()
+                        });
+                        addMessage(`✅ Document saved and watermarked: ${file.name} (FOR ${portal} USE ONLY)`, 'bot');
+                        updateDocumentList();
+                        
+                        if (!currentWatermarkedFile) {
+                            currentWatermarkedFile = data.watermarked;
+                            document.getElementById('watermarkBar').style.display = 'flex';
+                        }
+                    } else {
+                        addMessage(`❌ Failed to upload: ${file.name}`, 'error');
+                    }
+                } catch (err) {
+                    addMessage(`❌ Error uploading: ${file.name}`, 'error');
+                    console.error(err);
+                }
+            }
+            fileInput.value = '';
+        };
+        
+        function updateDocumentList() {
+            const listDiv = document.getElementById('documentList');
+            const panel = document.getElementById('docsPanel');
+            
+            if (uploadedDocuments.length === 0) {
+                panel.style.display = 'none';
+                return;
+            }
+            
+            panel.style.display = 'block';
+            listDiv.innerHTML = uploadedDocuments.map((doc, i) => `
+                <div class="doc-item">
+                    <span class="doc-name">📄 ${doc.name}</span>
+                    <span class="doc-portal">${doc.portal}</span>
+                    <button class="doc-download" onclick="downloadDoc('${doc.path}')">⬇️</button>
+                </div>
+            `).join('');
+        }
+        
+        function downloadDoc(path) {
+            const filename = path.split('\\').pop().split('/').pop();
+            window.open(`/download/${filename}`, '_blank');
+        }
+        
+        function downloadWatermarked() {
+            if (currentWatermarkedFile) {
+                const filename = currentWatermarkedFile.split('\\').pop().split('/').pop();
+                window.open(`/download/${filename}`, '_blank');
+            }
+        }
+        
+        async function sendMessage() {
+            const msg = messageInput.value.trim();
+            if (!msg) return;
+            
+            addMessage(msg, 'user');
+            messageInput.value = '';
+            
+            const loadingMsg = addMessage('<span class="loading"></span> Thinking...', 'bot');
+            
+            try {
+                const formData = new FormData();
+                formData.append('message', msg);
+                formData.append('portal', portalSelect.value);
+                
+                const res = await fetch('/chat', { method: 'POST', body: formData });
+                const data = await res.json();
+                
+                loadingMsg.remove();
+                addMessage(data.reply, 'bot');
+            } catch (err) {
+                loadingMsg.remove();
+                addMessage('❌ Error connecting to server. Make sure Flask is running.', 'error');
+                console.error(err);
+            }
+        }
+        
+        async function sendToExtension() {
+            try {
+                const res = await fetch('/get-data');
+                const data = await res.json();
+                
+                data.uploaded_documents = uploadedDocuments;
+                data.current_portal = portalSelect.value;
+                
+                window.postMessage({
+                    type: "GOVEASE_SAVE_DATA",
+                    data: data
+                }, "*");
+                
+                addMessage(`✅ Data sent to extension! (${uploadedDocuments.length} documents attached)`, 'bot');
+            } catch (err) {
+                addMessage('❌ Failed to get data from server', 'error');
+                console.error(err);
+            }
+        }
+        
+        async function resetChat() {
+            try {
+                await fetch('/reset', { method: 'POST' });
+                uploadedDocuments = [];
+                currentWatermarkedFile = null;
+                updateDocumentList();
+                document.getElementById('watermarkBar').style.display = 'none';
+                
+                messagesDiv.innerHTML = `
+                    <div class="msg bot">
+                        🏛️ <strong>Welcome to GovEase AI!</strong><br><br>
+                        I am your intelligent assistant for Malaysian government services.<br>
+                        I can help you with:<br>
+                        • 📄 LHDN (Tax filing)<br>
+                        • 🎓 PTPTN (Education loan)<br>
+                        • 💼 EPF (Savings/Withdrawal)<br><br>
+                        <strong>Let me collect your basic information first.</strong><br><br>
+                        ❓ <strong>What is your full name?</strong>
+                    </div>
+                `;
+                addMessage('🔄 Conversation reset. Let\'s start over!', 'bot');
+            } catch (err) {
+                console.error('Reset failed:', err);
+            }
+        }
+        
+        function addMessage(text, sender) {
+            const div = document.createElement('div');
+            div.className = `msg ${sender}`;
+            div.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            messagesDiv.appendChild(div);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return div;
+        }
+        
+        window.addEventListener("message", (event) => {
+            if (event.data.type === "GOVEASE_SAVE_DATA") {
+                console.log("[GovEase] Received data from extension:", event.data.data);
+            }
+        });
+        
+        console.log("[GovEase] Chat interface loaded");
+    </script>
 </body>
 </html>

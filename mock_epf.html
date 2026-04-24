@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPF - KWSP Pengeluaran</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo-icon { font-size: 40px; }
+        .logo-text h1 { font-size: 20px; margin-bottom: 4px; }
+        .logo-text p { font-size: 12px; opacity: 0.8; }
+        .nav { background: white; padding: 0 40px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; gap: 30px; }
+        .nav a { padding: 15px 0; color: #333; text-decoration: none; font-size: 14px; font-weight: 500; border-bottom: 3px solid transparent; }
+        .nav a:hover, .nav a.active { color: #e67e22; border-bottom-color: #e67e22; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px 40px; }
+        .form-container { background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; }
+        .form-header { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; padding: 20px 30px; }
+        .form-header h2 { font-size: 24px; margin-bottom: 5px; }
+        .form-header p { font-size: 13px; opacity: 0.9; }
+        .form-body { padding: 30px; }
+        .form-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 25px; }
+        .form-group { flex: 1; min-width: 200px; }
+        .form-group.full-width { flex: 100%; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 8px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; }
+        .govease-filled { background-color: #e8f8f2 !important; border-color: #e67e22 !important; }
+        .btn-submit { background: #e67e22; color: white; border: none; padding: 14px 30px; border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 20px; }
+        .btn-submit:hover { background: #d35400; }
+        .govease-fab { position: fixed; bottom: 24px; right: 24px; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; border: none; border-radius: 50px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 1000; }
+        .govease-fab:hover { transform: scale(1.05); }
+        .success-message { background: #e8f8f2; border-left: 4px solid #e67e22; padding: 15px 20px; border-radius: 10px; margin-top: 20px; display: none; }
+        .success-message.show { display: block; }
+        h3 { margin: 20px 0 15px 0; color: #e67e22; font-size: 18px; }
+        .balance-card { background: #fff3e0; border-radius: 12px; padding: 15px; margin-bottom: 20px; border-left: 4px solid #e67e22; }
+        .balance-amount { font-size: 20px; font-weight: bold; color: #d35400; }
+        .filled { background-color: #e8f8f2 !important; border-color: #e67e22 !important; }
+        .docs-info { background: #fff3e0; padding: 12px; border-radius: 8px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">💰</div>
+            <div class="logo-text">
+                <h1>KWSP - Kumpulan Wang Simpanan Pekerja</h1>
+                <p>e-Pengeluaran - Permohonan Pengeluaran Dalam Talian</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="nav">
+        <a href="#" class="active">e-Pengeluaran</a>
+        <a href="#">Semakan Baki</a>
+        <a href="#">Penyata Akaun</a>
+        <a href="#">Maklumat Akaun</a>
+    </div>
+    
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Borang Permohonan Pengeluaran KWSP</h2>
+                <p>Sila isi maklumat dengan lengkap dan tepat</p>
+            </div>
+            <div class="form-body">
+                <div class="balance-card">
+                    <h4>📊 Akaun Balance Information</h4>
+                    <div>Akaun 1: <span class="balance-amount" id="account1Balance">RM 45,678.90</span></div>
+                    <div>Akaun 2: <span class="balance-amount" id="account2Balance">RM 23,456.70</span></div>
+                    <div>Jumlah: <span class="balance-amount" id="totalBalance">RM 69,135.60</span></div>
+                </div>
+                
+                <form id="epfForm">
+                    <h3>📋 Maklumat Peribadi</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nama Penuh (Full Name)</label>
+                            <input type="text" id="fullName" placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label>No. MyKad (IC Number)</label>
+                            <input type="text" id="icNumber" placeholder="000000-00-0000">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tarikh Lahir (Date of Birth)</label>
+                            <input type="text" id="dob" placeholder="DD/MM/YYYY">
+                        </div>
+                        <div class="form-group">
+                            <label>Jantina (Gender)</label>
+                            <select id="gender">
+                                <option value="">Sila Pilih</option>
+                                <option value="Lelaki">Lelaki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Alamat Tetap (Permanent Address)</label>
+                        <textarea id="address" rows="3" placeholder="Your full address"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Poskod (Postcode)</label>
+                            <input type="text" id="postcode" placeholder="50000">
+                        </div>
+                        <div class="form-group">
+                            <label>Bandar (City)</label>
+                            <input type="text" id="city" placeholder="Kuala Lumpur">
+                        </div>
+                        <div class="form-group">
+                            <label>Negeri (State)</label>
+                            <select id="state">
+                                <option value="">Pilih Negeri</option>
+                                <option value="Kuala Lumpur">Kuala Lumpur</option>
+                                <option value="Selangor">Selangor</option>
+                                <option value="Penang">Penang</option>
+                                <option value="Johor">Johor</option>
+                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                <option value="Perak">Perak</option>
+                                <option value="Pahang">Pahang</option>
+                                <option value="Kedah">Kedah</option>
+                                <option value="Kelantan">Kelantan</option>
+                                <option value="Terengganu">Terengganu</option>
+                                <option value="Melaka">Melaka</option>
+                                <option value="Perlis">Perlis</option>
+                                <option value="Sabah">Sabah</option>
+                                <option value="Sarawak">Sarawak</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>No. Telefon (Phone Number)</label>
+                            <input type="text" id="phone" placeholder="012-3456789">
+                        </div>
+                        <div class="form-group">
+                            <label>Emel (Email Address)</label>
+                            <input type="email" id="email" placeholder="you@example.com">
+                        </div>
+                    </div>
+                    
+                    <h3>💼 Maklumat Pekerjaan</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>No. Akaun KWSP (EPF Account No.)</label>
+                            <input type="text" id="epfNumber" placeholder="12345678">
+                        </div>
+                        <div class="form-group">
+                            <label>Nama Majikan (Employer Name)</label>
+                            <input type="text" id="employer" placeholder="Company name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Pendapatan Bulanan (Monthly Income)</label>
+                            <input type="text" id="monthlyIncome" placeholder="RM 0">
+                        </div>
+                    </div>
+                    
+                    <h3>🏦 Maklumat Pengeluaran</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Jenis Pengeluaran (Withdrawal Type)</label>
+                            <select id="withdrawalType">
+                                <option value="">Sila Pilih</option>
+                                <option value="Umur 50">Umur 50 tahun</option>
+                                <option value="Umur 55">Umur 55 tahun</option>
+                                <option value="Pengeluaran Perumahan">Pengeluaran Perumahan</option>
+                                <option value="Pengeluaran Pendidikan">Pengeluaran Pendidikan</option>
+                                <option value="Pengeluaran Perubatan">Pengeluaran Perubatan</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Jumlah Pengeluaran (Withdrawal Amount)</label>
+                            <input type="text" id="withdrawalAmount" placeholder="RM 0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nama Bank (Bank Name)</label>
+                            <select id="bankName">
+                                <option value="">Pilih Bank</option>
+                                <option value="Maybank">Maybank</option>
+                                <option value="CIMB">CIMB</option>
+                                <option value="Public Bank">Public Bank</option>
+                                <option value="RHB">RHB</option>
+                                <option value="Hong Leong">Hong Leong</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>No. Akaun Bank (Bank Account No.)</label>
+                            <input type="text" id="bankAccount" placeholder="1234567890">
+                        </div>
+                    </div>
+                    
+                    <h3>📎 Dokumen Sokongan</h3>
+                    
+                    <div id="syncedDocs" style="display: none;">
+                        <div class="docs-info">
+                            <strong>✅ Documents attached via GovEase AI:</strong>
+                            <div id="syncedDocsList" style="margin-top: 8px;"></div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn-submit" onclick="submitForm()">Hantar Permohonan</button>
+                    
+                    <div id="successMessage" class="success-message">
+                        ✅ <strong>Permohonan berjaya dihantar!</strong><br>
+                        Rujukan permohonan: <span id="refNo">EPF2025-001234</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <button class="govease-fab" id="goveaseFillBtn">🤖 GovEase AI — Fill Form</button>
+    
+    <script>
+        function setValue(id, value) {
+            const el = document.getElementById(id);
+            if (el && value) {
+                el.value = value;
+                el.classList.add('govease-filled');
+                console.log(`[EPF] Set ${id} = ${value}`);
+            }
+        }
+        
+        function fillFormWithData(data) {
+            console.log('[EPF Portal] Filling with data:', data);
+            
+            // ========== Personal Info ==========
+            if (data.full_name) setValue('fullName', data.full_name);
+            if (data.ic_number) setValue('icNumber', data.ic_number.replace(/-/g, ''));
+            if (data.date_of_birth) setValue('dob', data.date_of_birth);
+            if (data.address) setValue('address', data.address);
+            if (data.email) setValue('email', data.email);
+            if (data.phone) setValue('phone', data.phone);
+            
+            // ========== Address Extraction ==========
+            if (data.address) {
+                // Postcode
+                const postcodeMatch = data.address.match(/\b(\d{5})\b/);
+                if (postcodeMatch) setValue('postcode', postcodeMatch[1]);
+                
+                // Gender default
+                if (!document.getElementById('gender').value) setValue('gender', 'Lelaki');
+                
+                // State and City mapping
+                const addressLower = data.address.toLowerCase();
+                const stateList = {
+                    'kuala lumpur': { state: 'Kuala Lumpur', city: 'Kuala Lumpur' },
+                    'selangor': { state: 'Selangor', city: 'Shah Alam' },
+                    'penang': { state: 'Penang', city: 'George Town' },
+                    'pulau pinang': { state: 'Penang', city: 'George Town' },
+                    'johor': { state: 'Johor', city: 'Johor Bahru' },
+                    'negeri sembilan': { state: 'Negeri Sembilan', city: 'Seremban' },
+                    'perak': { state: 'Perak', city: 'Ipoh' },
+                    'pahang': { state: 'Pahang', city: 'Kuantan' },
+                    'kedah': { state: 'Kedah', city: 'Alor Setar' },
+                    'kelantan': { state: 'Kelantan', city: 'Kota Bharu' },
+                    'terengganu': { state: 'Terengganu', city: 'Kuala Terengganu' },
+                    'melaka': { state: 'Melaka', city: 'Melaka' },
+                    'perlis': { state: 'Perlis', city: 'Kangar' },
+                    'sabah': { state: 'Sabah', city: 'Kota Kinabalu' },
+                    'sarawak': { state: 'Sarawak', city: 'Kuching' }
+                };
+                
+                for (const [key, info] of Object.entries(stateList)) {
+                    if (addressLower.includes(key)) {
+                        setValue('state', info.state);
+                        setValue('city', info.city);
+                        break;
+                    }
+                }
+                
+                // Default if no match
+                if (!document.getElementById('state').value) {
+                    setValue('state', 'Kuala Lumpur');
+                    setValue('city', 'Kuala Lumpur');
+                }
+            }
+            
+            // ========== EPF Specific Fields ==========
+            if (data.epf_number) {
+                setValue('epfNumber', data.epf_number);
+                console.log('✓ Set epfNumber:', data.epf_number);
+            }
+            
+            if (data.employer && data.employer !== data.full_name) {
+                setValue('employer', data.employer);
+                console.log('✓ Set employer:', data.employer);
+            }
+            
+            if (data.monthly_income) {
+                setValue('monthlyIncome', `RM ${data.monthly_income}`);
+                console.log('✓ Set monthlyIncome:', data.monthly_income);
+                // Auto calculate withdrawal amount
+                const amount = parseInt(data.monthly_income) * 12 * 0.3;
+                setValue('withdrawalAmount', `RM ${amount.toLocaleString()}`);
+            }
+            
+            if (data.withdrawal_type) {
+                setValue('withdrawalType', data.withdrawal_type);
+                console.log('✓ Set withdrawalType:', data.withdrawal_type);
+            } else if (!document.getElementById('withdrawalType').value) {
+                setValue('withdrawalType', 'Umur 55');
+            }
+            
+            if (data.bank_name) {
+                setValue('bankName', data.bank_name);
+                console.log('✓ Set bankName:', data.bank_name);
+            } else if (!document.getElementById('bankName').value) {
+                setValue('bankName', 'Maybank');
+            }
+            
+            if (data.bank_account) {
+                setValue('bankAccount', data.bank_account);
+                console.log('✓ Set bankAccount:', data.bank_account);
+            } else if (!document.getElementById('bankAccount').value) {
+                setValue('bankAccount', '1234567890');
+            }
+            
+            // ========== Account Balance Calculation ==========
+            if (data.monthly_income) {
+                const income = parseInt(data.monthly_income);
+                const account1 = income * 12 * 0.7;
+                const account2 = income * 12 * 0.3;
+                const el1 = document.getElementById('account1Balance');
+                const el2 = document.getElementById('account2Balance');
+                const elTotal = document.getElementById('totalBalance');
+                if (el1) el1.innerText = `RM ${account1.toLocaleString()}`;
+                if (el2) el2.innerText = `RM ${account2.toLocaleString()}`;
+                if (elTotal) elTotal.innerText = `RM ${(account1+account2).toLocaleString()}`;
+            }
+            
+            // ========== Documents ==========
+            if (data.uploaded_documents && data.uploaded_documents.length > 0) {
+                const syncedDiv = document.getElementById('syncedDocs');
+                const syncedList = document.getElementById('syncedDocsList');
+                if (syncedDiv && syncedList) {
+                    syncedList.innerHTML = '';
+                    data.uploaded_documents.forEach(doc => {
+                        syncedList.innerHTML += `<div>📄 ${doc.name} <span style="background:#e67e22; color:white; padding:2px 8px; border-radius:12px; font-size:10px;">✓ Watermarked (${doc.portal})</span></div>`;
+                    });
+                    syncedDiv.style.display = 'block';
+                }
+            }
+            
+            showNotification('✅ GovEase AI has filled your EPF form!');
+        }
+        
+        async function fetchDataAndFill() {
+            console.log('[EPF Portal] Fetching data from Flask...');
+            try {
+                const res = await fetch('http://localhost:5000/get-data');
+                const data = await res.json();
+                console.log('[EPF Portal] Data received:', data);
+                fillFormWithData(data);
+            } catch (err) {
+                console.error('[EPF Portal] Error:', err);
+                alert('❌ Cannot connect to server. Make sure Flask is running!');
+            }
+        }
+        
+        function showNotification(msg) {
+            const notif = document.createElement('div');
+            notif.style.cssText = 'position:fixed; bottom:100px; right:24px; background:#e67e22; color:white; padding:12px 20px; border-radius:12px; z-index:1001;';
+            notif.innerHTML = msg;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+        
+        function submitForm() {
+            const refNo = 'EPF' + new Date().getFullYear() + '-' + Math.floor(Math.random() * 100000);
+            const refSpan = document.getElementById('refNo');
+            if (refSpan) refSpan.innerHTML = refNo;
+            const successMsg = document.getElementById('successMessage');
+            if (successMsg) successMsg.classList.add('show');
+            setTimeout(() => {
+                if (successMsg) successMsg.classList.remove('show');
+            }, 5000);
+        }
+        
+        document.getElementById('goveaseFillBtn').addEventListener('click', fetchDataAndFill);
+        
+        window.addEventListener('load', () => {
+            fetch('http://localhost:5000/get-data')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.full_name) fillFormWithData(data);
+                })
+                .catch(err => console.log('No data yet'));
+        });
+        
+        console.log('[EPF Portal] Ready');
+    </script>
+</body>
+</html>
